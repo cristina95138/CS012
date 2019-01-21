@@ -1,0 +1,109 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <cmath>
+#include <cstdlib>
+#include <string>
+
+using namespace std;
+
+void readData(const string &, vector<double> &, vector<double> &);
+double interpolation(double, const vector<double> &, const vector<double> &);
+bool isOrdered(const vector<double> &);
+void reorder(vector<double> &, vector<double> &);
+
+int main() {
+   
+   string dataFile;
+   vector<double> fpAngle;
+   vector<double> coeLift;
+   double userfpAngle;
+   
+   cout << "Enter name of input data file:" << endl;
+   cin >> dataFile;
+   cout << endl;
+   
+   readData(dataFile, fpAngle, coeLift);
+   
+   if (!isOrdered(fpAngle)) {
+      reorder(fpAngle, coeLift);
+   }
+   else {
+      cout << "Flight-Path Angle: " << endl;
+      cin >> userfpAngle;
+      
+      if (userfpAngle >= fpAngle.at(0) && userfpAngle <= fpAngle.at(fpAngle.size() - 1)) {
+         interpolation(userfpAngle, fpAngle, coeLift);
+      }
+   }
+   
+   return 0;
+}
+
+void readData(const string &dataFile, vector<double> &fpAngle, vector<double> &coeLift) {
+   ifstream inFS;
+   double a, b;
+   
+   inFS.open(dataFile);
+   
+   if (!inFS.is_open()) {
+      cout << "Error opening " << dataFile << endl;
+      exit(1);
+   }
+   
+   while (!inFS.eof()) {
+      inFS >> a >> b;
+      if (!inFS.fail()) {
+         fpAngle.push_back(a);
+         coeLift.push_back(b);
+      }
+   }
+   inFS.close();
+}
+
+double interpolation(double userAngle, const vector<double> &fpAngle, const vector<double> &coeLift) {
+   double a, c;
+   double b = userAngle;
+   double fA, fB, fC;
+   for (unsigned i = 0; i < fpAngle.size(); ++i) {
+      if (userAngle != fpAngle.at(i)) {
+         if ((userAngle > fpAngle.at(i)) && (userAngle < fpAngle.at(i + 1))) {
+            a = fpAngle.at(i);
+            b = userAngle;
+            c = fpAngle.at(i + 1);
+            fA = coeLift.at(i);
+            fC = coeLift.at(i + 1);
+         
+            fB = fA + ((b - a) / (c - a)) * (fC - fA);
+            return fB;
+         }
+      }
+      else if (userAngle == fpAngle.at(i)) {
+         return coeLift.at(i);
+      }
+   }
+   return 0;
+}
+
+bool isOrdered(const vector<double> &fpAngle) {
+   bool ordered = true;
+   for (unsigned i = 0; i < fpAngle.size(); ++i) {
+      for (unsigned j = i + 1; j < fpAngle.size(); ++j) {
+         if (fpAngle.at(j) < fpAngle.at(i)) {
+            ordered = false;
+         }
+      }
+   }
+   return ordered;
+}
+
+void reorder(vector<double> &fpAngle, vector<double> &coeLift) {
+   for (unsigned i = 0; i + 1 < fpAngle.size(); ++i) {
+      for (unsigned j = i + 1; j < fpAngle.size(); ++j) {
+         if (fpAngle.at(j) < fpAngle.at(i)) {
+            swap(fpAngle.at(i), fpAngle.at(j));
+            swap(coeLift.at(i), coeLift.at(j));
+         }
+      }
+   }
+}
