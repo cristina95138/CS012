@@ -80,3 +80,130 @@ class Distance {
    double inches;    
     
 };
+
+Distance::Distance() {
+   feet = 0;
+   inches = 0.0;
+}
+
+Distance::Distance(unsigned ft, double in) {
+   feet = ft;
+   inches = in;
+   
+   if (ft < 0 || in < 0.0 || in >= 12) {
+      init();
+   }
+}
+
+Distance::Distance(double in) {
+   feet = 0;
+   inches = in;
+   
+   if (in < 0.0 || in >= 12.0) {
+      init();
+   }
+}
+
+unsigned Distance::getFeet() const {
+   return feet;
+}
+
+double Distance::getInches() const {
+   return inches;
+}
+
+double Distance::distanceInInches() const {
+   return ((feet * 12) + inches);
+}
+
+double Distance::distanceInFeet() const {
+   return ((inches / 12) + feet);
+}
+
+double Distance::distanceInMeters() const {
+   return (distanceInInches() * 0.0254);
+}
+
+const Distance Distance::operator+(const Distance &rhs) const {
+   return Distance((feet + rhs.feet), (inches + rhs.inches));
+}
+
+const Distance Distance::operator-(const Distance &rhs) const {
+   double diffFeet;
+   double diffInches;
+   
+   if (distanceInFeet() > rhs.distanceInFeet()) {
+      diffFeet = (distanceInFeet() - rhs.distanceInFeet());
+      diffInches = diffFeet - static_cast<int>(diffFeet);
+   }
+   else {
+      diffFeet = (rhs.distanceInFeet() - distanceInFeet());
+      diffInches = static_cast<int>(diffFeet) - diffFeet;
+   }
+   
+   diffInches *= 12.0;
+   
+   return Distance(static_cast<int>(diffFeet), diffInches);
+}
+
+ostream & operator<<(ostream &out, const Distance &rhs) {
+   out << rhs.feet << "' " << rhs.inches << "\"";
+   return out;
+}
+
+void Distance::init() {
+   unsigned feetConv;
+   double inchesConv;
+   
+   if (feet < 0) {
+      feet = -(feet);
+   }
+   if (inches < 0.0) {
+      inches = -(inches);
+   }
+   if (inches >= 12.0) {
+      feetConv = static_cast<int>(inches / 12);
+      inchesConv = inches - (feetConv * 12);
+      feet += feetConv;
+      inches = 0;
+      inches += inchesConv;
+   }
+}
+
+int main() {
+   Distance d1;
+   cout << "d1: " << d1 << endl;
+   
+   Distance d2 = Distance(2, 5.9);
+   Distance d3 = Distance(3.75);
+   cout << "d2: " << d2 << endl;
+   cout << "d3: " << d3 << endl;
+   
+   //test init helper function
+   Distance d4 = Distance(5, 19.34);
+   Distance d5 = Distance(100);
+   cout << "d4: " << d4 << endl;
+   cout << "d5: " << d5 << endl;
+   
+   //test add (<12 inches)
+   cout << "d4 + d5: " << (d4 + d5) << endl;
+   //test add (>12 inches)
+   cout << "d2 + d4: " << (d2 + d4) << endl;
+   
+   //test sub (0 ft)
+   cout << "d3 - d1: " << (d3 - d1) << endl;
+   //test sub (0 ft, negative conversion)
+   cout << "d1 - d3: " << (d1 - d3) << endl;
+   
+   //test sub (positive ft & inch)
+   cout << "d4 - d2: " << (d4 - d2) << endl;
+   //test sub (negative ft & inch)
+   cout << "d2 - d4: " << (d2 - d4) << endl;
+   
+   //test sub (negative ft, positive inch)
+   cout << "d4 - d5: " << (d4 - d5) << endl;
+   //test sub (positive ft, negative inch)
+   cout << "d5 - d2: " << (d5 - d2) << endl;
+   
+   return 0;
+}
