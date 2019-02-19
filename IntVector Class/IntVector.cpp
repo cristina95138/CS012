@@ -192,19 +192,23 @@ void IntVector::expand() {
 }
 
 void IntVector::expand(unsigned amount) {
-    int* expandPtr = data;
+    int* expandPtr = nullptr;
     
     if (cap == 0) {
         cap = amount;
-        data = new int[cap];
+        expandPtr = new int[cap];
     }
     else {
         cap = amount;
-        data = new int[cap];
+        expandPtr = new int[cap];
         for (unsigned i = 0; i < sz; ++i) {
-            data[i] = expandPtr[i];
+            expandPtr[i] = data[i];
         }
     }
+    
+    delete[] data;
+    
+    data = expandPtr;
     
 }
 
@@ -214,6 +218,5 @@ void IntVector::output() {
     for (unsigned i = 0; i < sz; ++i) {
         cout << data[i] << " ";
     }
-    
     cout << endl;
 }
