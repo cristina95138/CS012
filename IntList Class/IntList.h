@@ -23,15 +23,14 @@ class IntList {
 	bool empty() const;
 	const int & front() const;
 	const int & back() const;
-    
-    IntList(const IntList &cpy);
-    IntList & operator=(const IntList &rhs);
-    void push_back(int value);
-    void clear();
-    void selection_sort();
-    void insert_ordered(int value);
-    void remove_duplicates();
-    friend ostream & operator<<(ostream &out, const IntList &rhs);
+	IntList(const IntList &cpy);
+	IntList & operator=(const IntList &rhs);
+	void push_back(int value);
+	void clear();
+	void selection_sort();
+	void insert_ordered(int value);
+	void remove_duplicates();
+	friend ostream & operator<<(ostream &out, const IntList &rhs);
 };
 
 #endif
